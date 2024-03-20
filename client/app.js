@@ -1,3 +1,4 @@
+const socket = io();
 const loginForm = document.getElementById("welcome-form");
 const messagesSection = document.getElementById("messages-section");
 const messagesList = document.getElementById("messages-list");
@@ -7,6 +8,13 @@ const messageContentInput = document.getElementById("message-content");
 
 let userName = "";
 
+socket.on("message", ({ author, content }) => addMessage(author, content));
+socket.on("newUser", (userName) => {
+  addMessage("Chat Bot", userName + " has joined the conversation", true);
+});
+socket.on("userLeft", (userName) => {
+  addMessage("Chat Bot", userName + " has left the conversation... :(", true);
+});
 function login(event) {
   event.preventDefault();
 
@@ -17,7 +25,7 @@ function login(event) {
     return;
   }
   userName = username;
-
+  socket.emit("join", userName);
   loginForm.classList.remove("show");
 
   messagesSection.classList.add("show");
@@ -34,6 +42,7 @@ function sendMessage(event) {
     alert("Wiadomość nie może być pusta");
   } else {
     addMessage(userName, messageInput);
+    socket.emit("message", { author: userName, content: messageInput });
     messageContentInput.value = "";
   }
 }
@@ -44,6 +53,9 @@ function addMessage(author, content) {
   message.classList.add("message");
   message.classList.add("message--received");
   if (author === userName) message.classList.add("message--self");
+  if (author === "Chat Bot") {
+    message.classList.add("message--bot");
+  }
   message.innerHTML = `
       <h3 class="message__author">${userName === author ? "You" : author}</h3>
       <div class="message__content">
