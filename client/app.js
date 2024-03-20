@@ -31,7 +31,7 @@ function sendMessage(event) {
 
   const messageInput = messageContentInput.value;
   if (!messageInput.length) {
-    alert("Message cant be empty");
+    alert("Wiadomość nie może być pusta");
   } else {
     addMessage(userName, messageInput);
     messageContentInput.value = "";
@@ -52,3 +52,6 @@ function addMessage(author, content) {
     `;
   messagesList.appendChild(message);
 }
+
+userNameInput.setAttribute("autoComplete", "off");
+messageContentInput.setAttribute("autoComplete", "off");
